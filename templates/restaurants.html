@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Restaurants</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.page-hero { 
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--surface) 100%); 
+  border-bottom: 1px solid var(--border); 
+  padding: 56px 24px 44px; 
+}
+.page-hero-inner { 
+  max-width: 1200px;
+  margin: 0 auto; 
+}
+.page-hero h1 { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  margin-bottom: 8px; 
+  letter-spacing: -0.03em;
+  color: var(--secondary);
+}
+.page-hero p  { 
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 28px; 
+}
+.filter-bar   { 
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap; 
+}
+.filter-btn   { 
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-bounce); 
+}
+.filter-btn:hover,
+.filter-btn.active { 
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-glow); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.08);
+}
+.rest-card { 
+  text-decoration: none;
+  display: block;
+  color: inherit; 
+}
+.rest-img  { 
+  height: 190px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.8rem;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); 
+  border-bottom: 1px solid var(--border);
+}
+.rest-img-badge { 
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(30,30,30,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #F1C40F; 
+  box-shadow: var(--shadow-sm);
+}
+.rest-body { 
+  padding: 22px; 
+}
+.rest-name    { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 6px; 
+  color: var(--secondary);
+}
+.rest-cuisine { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px; 
+  font-weight: 500;
+}
+.rest-meta    { 
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px; 
+  flex-wrap: wrap;
+}
+.rest-meta-item { 
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px; 
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <h1 class="fade-up">🍽️ All Restaurants</h1>
+    <p class="fade-up-d1">Discover great food near you</p>
+    <div class="search-bar fade-up-d2" style="max-width:500px;margin-bottom:20px">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search restaurants…"/>
+    </div>
+    <div class="filter-bar fade-up-d3" id="filterBar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="veg">🌿 Veg Friendly</button>
+      <button class="filter-btn" data-filter="fast">⚡ Fast Delivery</button>
+      <button class="filter-btn" data-filter="top">⭐ Top Rated</button>
+    </div>
+  </div>
+</div>
+
+<main class="page">
+  <div class="grid-auto" id="restGrid"><div class="loader-wrap" style="grid-column:1/-1"><div class="spinner"></div></div></div>
+</main>
+
+<div id="float-root"></div>
+<script type="module">
+import { renderNav, renderFloatCart, Cart, toast, requireAuth } from '/static/app.js';
+import { getRestaurants } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML   = renderNav('/restaurants.html');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+const EMOJIS   = ['🍕','🍜','🍛','🥗','🍔','🌮','🥘','🍱','🍝','🍲','🍣','🥙'];
+const CUISINES = ['Indian','Chinese','Italian','Mexican','Thai','Japanese','Mediterranean','American'];
+let allRestaurants = [];
+
+function renderCard(r, i) {
+  const rating  = r.rating ? parseFloat(r.rating).toFixed(1) : (4 + Math.random()).toFixed(1);
+  const time    = 20 + Math.floor(Math.random() * 20);
+  const cuisine = CUISINES[i % CUISINES.length];
+  return `
+  <a class="card rest-card fade-up" href="menu.html?restaurant=${r.id}&name=${encodeURIComponent(r.name||'Restaurant')}">
+    <div class="rest-img">${EMOJIS[i%EMOJIS.length]}<div class="rest-img-badge">⭐ ${rating}</div></div>
+    <div class="rest-body">
+      <div class="rest-name">${r.name||'Restaurant'}</div>
+      <div class="rest-cuisine">${cuisine} Cuisine</div>
+      <div class="rest-meta">
+        <div class="rest-meta-item">🕐 ${time}-${time+10} min</div>
+        <div class="rest-meta-item">🛵 Free delivery</div>
+        <div class="rest-meta-item">💰 ₹200 for two</div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="pointer-events:none">View Menu →</button>
+    </div>
+  </a>`;
+}
+
+const grid = document.getElementById('restGrid');
+try {
+  requireAuth();
+  allRestaurants = await getRestaurants();
+  grid.innerHTML = allRestaurants.map((r,i) => renderCard(r,i)).join('') ||
+    `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🍽️</div><h3>No restaurants found</h3></div>`;
+} catch (err) {
+  if (err.message !== '__auth_redirect__') {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${err.message || 'Make sure the backend is running'}</p></div>`;
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q        = this.value.toLowerCase();
+  const filtered = allRestaurants.filter(r => (r.name||'').toLowerCase().includes(q));
+  grid.innerHTML = filtered.map((r,i) => renderCard(r,i)).join('') ||
+    `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><h3>No matches for "${this.value}"</h3></div>`;
+});
+
+document.getElementById('filterBar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn'); if(!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+</script>
+</body>
+</html>

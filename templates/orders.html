@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Orders</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.orders-hero { 
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 56px 24px 44px; 
+}
+.orders-hero-inner { 
+  max-width: 1200px;
+  margin: 0 auto; 
+}
+.order-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: var(--transition-bounce); 
+  box-shadow: var(--shadow);
+}
+.order-card:hover { 
+  border-color: var(--border-hot); 
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hot);
+}
+.order-head { 
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid var(--border); 
+  background: var(--surface-2);
+}
+.order-id   { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem; 
+  color: var(--secondary);
+}
+.order-date { 
+  font-size: 0.85rem;
+  color: var(--text-secondary); 
+  font-weight: 500;
+  margin-top: 4px;
+}
+.order-status { 
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em; 
+}
+.status-delivered { 
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1.5px solid rgba(46, 204, 113, 0.2); 
+}
+.status-preparing { 
+  background: rgba(241, 196, 15, 0.06);
+  color: #D4AC0D;
+  border: 1.5px solid rgba(241, 196, 15, 0.2); 
+}
+.status-pending   { 
+  background: var(--primary-glow);
+  color: var(--primary);
+  border: 1.5px solid var(--border-hot); 
+}
+.order-body { 
+  padding: 28px; 
+}
+.order-items-list { 
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px; 
+}
+.oi-row   { 
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+}
+.oi-name  { 
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+  color: var(--secondary);
+}
+.oi-price { 
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-secondary); 
+}
+.order-total { 
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 18px;
+  border-top: 1px solid var(--border); 
+}
+.order-total-label { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+.order-total-val   { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--primary);
+  margin-left: 12px; 
+}
+.filter-tabs { 
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px; 
+}
+.tab-btn { 
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-bounce); 
+}
+.tab-btn:hover,
+.tab-btn.active { 
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-glow); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.08);
+}
+.timeline-dot { 
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block; 
+  box-shadow: 0 0 8px var(--accent);
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="orders-hero">
+  <div class="orders-hero-inner">
+    <h1 class="fade-up" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:6px">📋 Your Orders</h1>
+    <p class="fade-up-d1" style="color:var(--text2)">Track, reorder, and relive your best meals</p>
+  </div>
+</div>
+
+<main class="page">
+  <div id="content"></div>
+</main>
+
+<div id="float-root"></div>
+<script type="module">
+import { renderNav, renderFloatCart, Cart, User, toast, fmt, requireAuth } from '/static/app.js';
+import { getOrders } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML   = renderNav('/orders.html');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+const content = document.getElementById('content');
+const user    = User.get();
+
+if (!user) {
+  content.innerHTML = `
+    <div style="text-align:center;padding:80px 20px">
+      <div style="font-size:3rem;margin-bottom:16px">🔒</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:8px">Log in to see your orders</h2>
+      <p style="color:var(--text2);margin-bottom:24px">Your order history lives here after you create a profile</p>
+      <a href="login.html" class="btn btn-primary btn-lg">Create Profile →</a>
+    </div>`;
+} else {
+  content.innerHTML = `<div class="loader-wrap"><div class="spinner"></div></div>`;
+
+  const FOOD_EMOJIS = ['🍕','🍜','🍛','🥗','🍔','🌮','🍱','🍝','🍲','🍣'];
+
+  function statusClass(s) {
+    const sl = (s||'').toLowerCase();
+    if (sl.includes('deliver')) return 'status-delivered';
+    if (sl.includes('prepar') || sl.includes('out')) return 'status-preparing';
+    return 'status-pending';
+  }
+
+  function statusDotColor(s) {
+    const sl = (s||'').toLowerCase();
+    if (sl.includes('deliver')) return '#2ECC71';
+    if (sl.includes('prepar') || sl.includes('out')) return '#FFBE00';
+    return 'var(--primary)';
+  }
+
+  function renderOrders(orders) {
+    if (!orders.length) {
+      content.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📦</div>
+          <h3>No orders yet</h3>
+          <p>Your order history will appear here</p>
+          <a href="restaurants.html" class="btn btn-primary mt-16">Start Ordering →</a>
+        </div>`;
+      return;
+    }
+
+    content.innerHTML = `
+      <div class="filter-tabs mb-24">
+        <button class="tab-btn active" data-tab="all">All Orders (${orders.length})</button>
+        <button class="tab-btn" data-tab="recent">Recent</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px" id="ordersList">
+        ${orders.map((o, i) => {
+          const items  = o.items || [];
+          const status = o.status || 'pending';
+          const total  = o.total_price || items.reduce((s, it) => {
+            const ex = (it.selected_ingredients||[]).reduce((t,op)=>t+Number(op.extra_price||0),0);
+            return s + ((Number(it.price)||0)+ex) * (it.quantity||1);
+          }, 0);
+          const date   = o.created_at
+            ? new Date(o.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+            : 'Recently';
+          return `
+          <div class="order-card fade-up" style="animation-delay:${i*0.07}s">
+            <div class="order-head">
+              <div>
+                <div class="order-id">Order #${o.id}</div>
+                <div class="order-date">${date}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="order-status ${statusClass(status)}">
+                  <span class="timeline-dot" style="background:${statusDotColor(status)}"></span>
+                  ${status}
+                </span>
+              </div>
+            </div>
+            <div class="order-body">
+              ${(function(){
+                const steps = ['pending','preparing','out_for_delivery','delivered'];
+                const labels = {pending:'Order Placed', preparing:'Preparing', out_for_delivery:'Out for Delivery', delivered:'Delivered'};
+                const cur = steps.indexOf((status||'').toLowerCase());
+                const ad = o.address_detail;
+                const addrHtml = ad ? `<div style="font-size:.82rem;color:var(--text-secondary);margin-bottom:14px"><strong style="color:var(--secondary)">📍 ${ad.address_type||'Home'}:</strong> ${[ad.house, ad.street, ad.city, ad.pincode].filter(Boolean).join(', ')}</div>` : '';
+                if (status === 'cancelled') return addrHtml + '<div style="padding:10px 14px;border-radius:12px;background:var(--danger-soft);color:var(--danger);font-weight:700;margin-bottom:14px">Order cancelled</div>';
+                return addrHtml + `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:18px;padding:14px;background:var(--surface-2);border-radius:12px;flex-wrap:wrap">
+                  ${steps.map((st,i)=>{
+                    const done = i <= Math.max(cur,0);
+                    return `<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">
+                      <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;background:${done?'var(--primary)':'var(--border)'};color:${done?'#fff':'var(--text-muted)'}">${done?'✓':i+1}</div>
+                      <span style="font-size:.78rem;font-weight:${done?'700':'500'};color:${done?'var(--secondary)':'var(--text-muted)'}">${labels[st]}</span>
+                      ${i<steps.length-1?`<div style="flex:1;height:2px;background:${i<cur?'var(--primary)':'var(--border)'};margin:0 4px"></div>`:''}
+                    </div>`;
+                  }).join('')}
+                </div>`;
+              })()}
+              ${items.length ? `
+              <div class="order-items-list">
+                ${items.slice(0,5).map((it, j) => {
+                  const mods = (it.selected_ingredients || []).map(o => o.name).join(', ');
+                  const notes = it.special_instructions || '';
+                  return `
+                  <div class="oi-row">
+                    <div class="oi-name">
+                      ${FOOD_EMOJIS[j%FOOD_EMOJIS.length]} ${it.dish_name||it.name||'Item'} <span style="color:var(--text3)">×${it.quantity||1}</span>
+                      ${mods ? `<div style="font-size:0.75rem;color:var(--text2);margin-left:24px;margin-top:2px">With: ${mods}</div>` : ''}
+                      ${notes ? `<div style="font-size:0.75rem;color:var(--primary);margin-left:24px;font-style:italic">📝 ${notes}</div>` : ''}
+                    </div>
+                    <div class="oi-price">${fmt(((Number(it.price)||0) + (it.selected_ingredients||[]).reduce((t,op)=>t+Number(op.extra_price||0),0)) * (it.quantity||1))}</div>
+                  </div>`;
+                }).join('')}
+                ${items.length > 5 ? `<div style="font-size:0.82rem;color:var(--text2)">+${items.length-5} more item${items.length-5===1?'':'s'}</div>` : ''}
+              </div>` : `<p style="color:var(--text2);font-size:0.9rem;margin-bottom:16px">No item details available</p>`}
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)">
+                <div style="font-size:0.8rem;color:var(--text2)">
+                  ${o.payment_status==='cod' ? 'Cash on Delivery' : (o.payment_method || 'UPI')} · <span style="color:${o.payment_status==='paid'?'#2ECC71':o.payment_status==='cod'?'#D4AC0D':'#FFBE00'};font-weight:600">${o.payment_status==='cod' ? 'Pending collection' : o.payment_status}</span>
+                  ${o.transaction_id ? `<div style="font-size:0.72rem;color:var(--text3)">Txn: ${o.transaction_id}</div>` : ''}
+                </div>
+                <div>
+                  <span class="order-total-label">Total:</span>
+                  <span class="order-total-val">${fmt(total)}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  try {
+  requireAuth();
+    const orders = await getOrders();
+    renderOrders(orders);
+  } catch (e) {
+    if (e.message === '__auth_redirect__') return;
+    content.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <h3>Failed to load orders</h3>
+        <p>${e.message}</p>
+        <a href="restaurants.html" class="btn btn-primary mt-16">Browse & Order Now →</a>
+      </div>`;
+  }
+}
+</script>
+</body>
+</html>

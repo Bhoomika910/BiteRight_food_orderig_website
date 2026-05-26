@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Item</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.item-page { 
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 120px; 
+}
+.back-link { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  transition: var(--transition); 
+}
+.back-link:hover { 
+  color: var(--primary); 
+  transform: translateX(-4px);
+}
+.item-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden; 
+  box-shadow: var(--shadow-md);
+}
+.item-hero { 
+  height: 240px;
+  background: linear-gradient(135deg, var(--bg2), var(--surface-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5rem;
+  position: relative; 
+  border-bottom: 1px solid var(--border);
+}
+.item-dot { 
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2.5px solid; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.item-dot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+.item-dot.veg { 
+  border-color: var(--accent); 
+}
+.item-dot.veg::after {
+  background: var(--accent);
+}
+.item-dot.nonveg { 
+  border-color: var(--danger); 
+}
+.item-dot.nonveg::after {
+  background: var(--danger);
+}
+.item-body { 
+  padding: 36px; 
+}
+.item-name  { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: 1.8rem;
+  margin-bottom: 10px; 
+  letter-spacing: -0.02em;
+  color: var(--secondary);
+}
+.item-price { 
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 20px; 
+}
+.item-tags  { 
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px; 
+}
+.item-section { 
+  margin-bottom: 28px; 
+}
+.item-section h4 { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px; 
+}
+.item-section p  { 
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+  line-height: 1.6; 
+}
+.ingredient-list { 
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap; 
+}
+.ingredient-pill { 
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary); 
+  font-weight: 600;
+}
+.ingredient-pill.danger { 
+  background: var(--danger-soft);
+  border-color: rgba(231, 76, 60, 0.25);
+  color: var(--danger);
+  font-weight: 700; 
+}
+.ing-options { 
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; 
+}
+.ing-opt { 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  font-size: 0.92rem; 
+  box-shadow: var(--shadow-sm);
+}
+.ing-opt:hover { 
+  border-color: var(--primary-light); 
+  transform: translateY(-2px);
+}
+.ing-opt input { 
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer; 
+}
+.ing-opt input:checked + .ing-opt-label { 
+  color: var(--text);
+  font-weight: 700; 
+}
+.ing-opt-label { 
+  flex: 1;
+  color: var(--text-secondary); 
+  font-weight: 600;
+}
+.ing-opt-extra { 
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 700; 
+}
+.ing-opt.danger { 
+  border-color: rgba(231, 76, 60, 0.25);
+  background: rgba(231, 76, 60, 0.03); 
+}
+.ing-opt.danger:hover {
+  border-color: var(--danger);
+}
+.qty-row { 
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px; 
+}
+.qty-ctrl  { 
+  display: flex;
+  align-items: center;
+  gap: 14px; 
+}
+.qty-btn   { 
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--secondary);
+  cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce); 
+}
+.qty-btn:hover { 
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-glow); 
+  transform: scale(1.05);
+}
+.qty-val   { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  min-width: 32px;
+  text-align: center; 
+}
+.notes-area { 
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 90px;
+  transition: var(--transition);
+  outline: none; 
+}
+.notes-area:focus { 
+  border-color: var(--primary-light);
+  background: var(--surface-hover); 
+  box-shadow: 0 0 0 4px var(--primary-glow-hd);
+}
+.add-bar { 
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 48px;
+  background: rgba(255, 248, 242, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 107, 53, 0.08);
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  z-index: 100; 
+  box-shadow: 0 -10px 30px rgba(30, 30, 30, 0.03);
+}
+.add-bar-price { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--primary);
+  min-width: 100px; 
+}
+.allergy-warning { 
+  background: var(--danger-soft);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-size: 0.92rem;
+  color: var(--danger);
+  font-weight: 600;
+  display: none; 
+  box-shadow: var(--shadow-sm);
+}
+.allergy-warning.show { 
+  display: block; 
+}
+@media (max-width:520px) { 
+  .ing-options { grid-template-columns: 1fr; } 
+  .add-bar { padding: 16px 20px; }
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="item-page">
+  <a id="backLink" href="javascript:history.back()" class="back-link">← Back to Menu</a>
+  <div id="itemContent">
+    <div class="loader-wrap"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div class="add-bar" id="addBar" style="display:none">
+  <span class="add-bar-price" id="addBarPrice">₹0</span>
+  <button class="btn btn-primary btn-lg" id="addToCartBtn" style="flex:1;max-width:320px">
+    🛒 Add to Cart
+  </button>
+</div>
+
+<div id="float-root"></div>
+<script type="module">
+import { renderNav, renderFloatCart, Cart, User, toast, dietLabel, dietDotClass, dietEmoji, dietTagClass } from '/static/app.js';
+import { getMenu } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML   = renderNav('');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+
+const params   = new URLSearchParams(location.search);
+const itemId   = parseInt(params.get('id'));
+const restId   = params.get('restaurant');
+const restName = decodeURIComponent(params.get('restaurantName') || 'Restaurant');
+const itemEl   = document.getElementById('itemContent');
+
+document.getElementById('backLink').href =
+  `/menu.html?restaurant=${restId}&name=${encodeURIComponent(restName)}`;
+
+function showError(msg) {
+  itemEl.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⚠️</div>
+      <h3>Failed to load item</h3>
+      <p style="color:#E74C3C">${msg}</p>
+      <a href="javascript:history.back()" class="btn btn-secondary mt-16">← Go Back</a>
+    </div>`;
+}
+
+if (!restId || isNaN(itemId)) {
+  showError('Missing item or restaurant ID in URL.');
+} else {
+  let qty = 1;
+
+  getMenu(restId)
+    .then(items => {
+      const dish = items.find(d => d.id === itemId);
+      if (!dish) { showError('This dish may no longer be available.'); return; }
+
+      document.title = `BiteRight — ${dish.name}`;
+
+      const user        = User.get();
+      const userAllergy = (user?.allergies || '').toLowerCase().trim();
+      const allergyList = userAllergy ? userAllergy.split(',').map(a => a.trim()).filter(Boolean) : [];
+      const containsAllergen = (text) => {
+        const lower = (text || '').toLowerCase();
+        return allergyList.filter(a => lower.includes(a));
+      };
+
+      const ingredientsText = (dish.ingredients || '').toLowerCase();
+      const allergyHits = containsAllergen(ingredientsText);
+      const allergyWarning = allergyHits.length
+        ? `<div class="allergy-warning show">⚠️ Contains your allergens: <strong>${allergyHits.join(', ')}</strong></div>`
+        : '';
+
+      const ingList = dish.ingredients
+        ? dish.ingredients.split(',').map(ing => {
+            const t = ing.trim();
+            const danger = containsAllergen(t).length > 0;
+            return `<span class="ingredient-pill ${danger ? 'danger' : ''}">${t}</span>`;
+          }).join('')
+        : '<span style="color:var(--text2);font-size:0.88rem">No ingredients listed</span>';
+
+      const options = Array.isArray(dish.ingredient_options) ? dish.ingredient_options : [];
+      const customizationHtml = options.length ? `
+        <div class="item-section">
+          <h4>Customize Ingredients</h4>
+          <div class="ing-options" id="ingOptions">
+            ${options.map(opt => {
+              const danger = containsAllergen(opt.name).length > 0;
+              const extra = Number(opt.extra_price) > 0 ? `<span class="ing-opt-extra">+₹${opt.extra_price}</span>` : '';
+              return `
+                <label class="ing-opt ${danger ? 'danger' : ''}">
+                  <input type="checkbox" data-opt-id="${opt.id}" data-opt-name="${opt.name}" data-extra="${opt.extra_price}" ${opt.is_default ? 'checked' : ''}/>
+                  <span class="ing-opt-label">${opt.name}${danger ? ' ⚠️' : ''}</span>
+                  ${extra}
+                </label>`;
+            }).join('')}
+          </div>
+          <p style="font-size:0.78rem;color:var(--text3);margin-top:8px">Tick to include. Toppings with + price add to your total.</p>
+        </div>` : '';
+
+      itemEl.innerHTML = `
+        <div class="item-card fade-up">
+          <div class="item-hero">
+            <span>${dietEmoji(dish.diet_tags)}</span>
+            <div class="item-dot ${dietDotClass(dish.diet_tags)}"></div>
+          </div>
+          <div class="item-body">
+            <h1 class="item-name">${dish.name}</h1>
+            <div class="item-price">₹${dish.price}</div>
+            <div class="item-tags">
+              <span class="tag ${dietTagClass(dish.diet_tags)}">${dietLabel(dish.diet_tags)}</span>
+              ${dish.mood_tags ? `<span class="tag tag-mood">${dish.mood_tags}</span>` : ''}
+            </div>
+            ${allergyWarning}
+            <div class="item-section">
+              <h4>Ingredients</h4>
+              <div class="ingredient-list">${ingList}</div>
+            </div>
+            ${customizationHtml}
+            <div class="item-section">
+              <h4>Quantity</h4>
+              <div class="qty-row">
+                <div class="qty-ctrl">
+                  <button class="qty-btn" id="qtyDec">−</button>
+                  <span class="qty-val" id="qtyVal">1</span>
+                  <button class="qty-btn" id="qtyInc">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="item-section">
+              <h4>Special Instructions (optional)</h4>
+              <textarea class="notes-area" id="notesInput"
+                placeholder="e.g. Less spicy, no onion, extra sauce…" maxlength="200"></textarea>
+            </div>
+          </div>
+        </div>`;
+
+      const basePrice = parseFloat(dish.price);
+      const optsContainer = document.getElementById('ingOptions');
+
+      function selectedOptions() {
+        if (!optsContainer) return [];
+        return Array.from(optsContainer.querySelectorAll('input[type=checkbox]:checked'))
+          .map(cb => ({
+            id:    parseInt(cb.dataset.optId),
+            name:  cb.dataset.optName,
+            extra: parseFloat(cb.dataset.extra || 0),
+          }));
+      }
+      function extrasTotal() {
+        return selectedOptions().reduce((s, o) => s + o.extra, 0);
+      }
+      function refreshBar() {
+        const unit = basePrice + extrasTotal();
+        document.getElementById('addBarPrice').textContent =
+          `₹${(unit * qty).toLocaleString('en-IN')}`;
+      }
+
+      document.getElementById('addBar').style.display = 'flex';
+      refreshBar();
+      if (optsContainer) optsContainer.addEventListener('change', refreshBar);
+
+      document.getElementById('qtyDec').addEventListener('click', () => {
+        if (qty > 1) { qty--; document.getElementById('qtyVal').textContent = qty; refreshBar(); }
+      });
+      document.getElementById('qtyInc').addEventListener('click', () => {
+        qty++; document.getElementById('qtyVal').textContent = qty; refreshBar();
+      });
+
+      document.getElementById('addToCartBtn').addEventListener('click', () => {
+        const notes  = document.getElementById('notesInput').value.trim();
+        const picked = selectedOptions();
+        Cart.add({
+          id:          dish.id,
+          name:        dish.name,
+          price:       basePrice,
+          diet_tags:   dish.diet_tags || '',
+          mood_tags:   dish.mood_tags || '',
+          ingredients: dish.ingredients || '',
+          ingredient_option_ids:   picked.map(o => o.id),
+          ingredient_option_names: picked.map(o => o.name),
+          ingredient_extra_total:  extrasTotal(),
+          special_instructions:    notes,
+          qty,
+        }, restId, restName);
+        toast(`${qty}× ${dish.name} added to cart!`, 'cart');
+        setTimeout(() => location.href = `/menu.html?restaurant=${restId}&name=${encodeURIComponent(restName)}`, 600);
+      });
+    })
+    .catch(e => showError(e.message));
+}
+</script>
+</body>
+</html>

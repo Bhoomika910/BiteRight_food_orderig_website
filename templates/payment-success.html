@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Payment Successful</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.success-wrap { 
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  text-align: center; 
+}
+.tick { 
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+  margin: 0 auto 24px;
+  color: var(--accent);
+  box-shadow: 0 10px 30px rgba(46, 204, 113, 0.15);
+  animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
+}
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+.card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: left;
+  margin-top: 32px; 
+  box-shadow: var(--shadow-md);
+}
+.k { 
+  color: var(--text-secondary);
+  font-size: 0.9rem; 
+  font-weight: 600;
+}
+.v { 
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  color: var(--secondary);
+}
+.kv { 
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border); 
+}
+.kv:last-child { 
+  border: none; 
+}
+.success-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  color: var(--secondary);
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="success-wrap">
+  <div class="progress-stepper fade-up" style="margin-bottom: 40px;">
+    <div class="step-item completed">
+      <span class="step-num">1</span>
+      <span class="step-label">Cart</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item completed">
+      <span class="step-num">2</span>
+      <span class="step-label">Payment</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item active">
+      <span class="step-num">3</span>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
+
+  <div class="tick">✓</div>
+  <h1 class="success-title">Payment Successful!</h1>
+  <p style="color:var(--text-secondary); font-size: 1.05rem; font-weight: 500;">Your food is being prepared with love 🍳</p>
+
+  <div class="card" id="details">
+    <div class="loader-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <div style="display:flex;gap:16px;justify-content:center;margin-top:32px">
+    <a href="/orders.html"      class="btn btn-primary btn-lg">Track Order →</a>
+    <a href="/restaurants.html" class="btn btn-secondary btn-lg">Order More</a>
+  </div>
+</div>
+
+<script type="module">
+import { renderNav, fmt, requireAuth } from '/static/app.js';
+import { getOrder } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML = renderNav('');
+requireAuth();
+
+const params = new URLSearchParams(location.search);
+const orderId = parseInt(params.get('order'));
+const txn     = params.get('txn') || '';
+
+try {
+  const order = await getOrder(orderId);
+  const isCod = order.payment_status === 'cod';
+  // Branch hero copy & icon based on COD vs paid
+  const hero = document.querySelector('.success-wrap');
+  const titleEl = hero.querySelector('.success-title');
+  const subEl   = hero.querySelector('p');
+  const tick    = hero.querySelector('.tick');
+  if (isCod) {
+    titleEl.textContent = 'Order Confirmed!';
+    subEl.textContent   = 'Keep the exact amount ready — pay on delivery 💵';
+    tick.style.background = 'rgba(241,196,15,.1)';
+    tick.style.borderColor = '#F1C40F';
+    tick.style.color = '#D4AC0D';
+    tick.textContent = '✓';
+  }
+  const ad = order.address_detail;
+  const addressRow = ad ? `<div class="kv"><span class="k">Delivering to</span><span class="v" style="text-align:right">${[ad.house, ad.street].filter(Boolean).join(', ')}<br/><span style="font-weight:500;color:var(--text-secondary);font-size:.85rem">${[ad.city, ad.state, ad.pincode].filter(Boolean).join(', ')}</span></span></div>` : '';
+  const statusLabel = isCod ? 'Pending collection (COD)' : 'Paid';
+  const statusColor = isCod ? '#D4AC0D' : '#2ECC71';
+  const amountLabel = isCod ? 'Amount due on delivery' : 'Amount paid';
+  document.getElementById('details').innerHTML = `
+    <div class="kv"><span class="k">Order ID</span><span class="v">#${order.id}</span></div>
+    <div class="kv"><span class="k">Transaction ID</span><span class="v">${order.transaction_id || txn || '—'}</span></div>
+    <div class="kv"><span class="k">Payment method</span><span class="v">${isCod ? 'Cash on Delivery' : (order.payment_method || '—')}</span></div>
+    <div class="kv"><span class="k">Payment status</span><span class="v" style="color:${statusColor}">${statusLabel}</span></div>
+    <div class="kv"><span class="k">Order status</span><span class="v" style="color:var(--primary)">${(order.status||'').replace(/_/g,' ')}</span></div>
+    ${addressRow}
+    <div class="kv"><span class="k">${amountLabel}</span><span class="v" style="color:var(--primary)">${fmt(order.total_price)}</span></div>`;
+} catch (e) {
+  document.getElementById('details').innerHTML = `<p style="color:var(--text2)">Order created. ${txn ? 'Txn: '+txn : ''}</p>`;
+}
+</script>
+</body>
+</html>

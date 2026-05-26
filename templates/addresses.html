@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Delivery Address</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.addr-wrap { max-width: 980px; margin: 0 auto; padding: 32px 24px 100px; }
+.addr-grid { display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+.addr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+             padding: 20px; box-shadow: var(--shadow-md); }
+.addr-list { display: flex; flex-direction: column; gap: 14px; }
+.addr-row  { border: 1.5px solid var(--border); background: var(--surface);
+             border-radius: var(--radius); padding: 18px 20px; cursor: pointer;
+             transition: var(--transition-bounce); position: relative; }
+.addr-row:hover { border-color: var(--border-hot); transform: translateY(-2px); box-shadow: var(--shadow-hot); }
+.addr-row.selected { border-color: var(--primary); background: var(--primary-glow); box-shadow: var(--shadow-hot); }
+.addr-row .pill { position: absolute; top: 14px; right: 16px; font-size: .7rem; font-weight: 800;
+                  text-transform: uppercase; letter-spacing: .06em; padding: 4px 10px; border-radius: 100px;
+                  background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(46,204,113,.25); }
+.addr-row .type { font-family: 'Poppins', sans-serif; font-weight: 800; color: var(--secondary); margin-bottom: 4px; }
+.addr-row .who  { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.addr-row .lines{ color: var(--text-secondary); font-size: .92rem; line-height: 1.55; }
+.addr-row .acts { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: .78rem; font-weight: 700; color: var(--text-secondary);
+               text-transform: uppercase; letter-spacing: .06em; }
+.field input, .field select {
+  background: var(--surface-2); border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 12px 16px; color: var(--text); font: inherit; outline: none; transition: var(--transition);
+}
+.field input:focus { border-color: var(--primary-light); background: var(--surface-hover);
+                     box-shadow: 0 0 0 4px var(--primary-glow-hd); }
+.field .err { color: var(--danger); font-size: .78rem; font-weight: 600; min-height: 1em; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.empty-state { text-align: center; padding: 40px 16px; color: var(--text-secondary); }
+@media (max-width: 820px) { .addr-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="addr-wrap">
+  <div class="progress-stepper fade-up" id="stepper" style="display:none">
+    <div class="step-item completed"><span class="step-num">1</span><span class="step-label">Cart</span></div>
+    <div class="step-divider"></div>
+    <div class="step-item active"><span class="step-num">2</span><span class="step-label">Address</span></div>
+    <div class="step-divider"></div>
+    <div class="step-item"><span class="step-num">3</span><span class="step-label">Payment</span></div>
+  </div>
+
+  <h1 style="font-family:'Poppins',sans-serif;font-weight:900;font-size:1.8rem;margin:20px 0 24px;letter-spacing:-.02em;color:var(--secondary)">
+    📍 Delivery Address
+  </h1>
+
+  <div class="addr-grid">
+    <div class="addr-card">
+      <h3 style="font-family:'Poppins',sans-serif;font-weight:800;margin-bottom:18px">Saved addresses</h3>
+      <div id="addrList" class="addr-list">
+        <div class="loader-wrap"><div class="spinner"></div></div>
+      </div>
+      <button id="continueBtn" class="btn btn-primary btn-full btn-lg mt-16" style="display:none">Continue to Payment →</button>
+    </div>
+
+    <div class="addr-card">
+      <h3 style="font-family:'Poppins',sans-serif;font-weight:800;margin-bottom:18px" id="formTitle">Add new address</h3>
+      <form id="addrForm" novalidate>
+        <div class="field"><label>Full name</label><input name="full_name" required maxlength="120"/><div class="err"></div></div>
+        <div class="field"><label>Phone number</label><input name="phone" required maxlength="20" inputmode="tel"/><div class="err"></div></div>
+        <div class="field"><label>House / Flat / Door no.</label><input name="house" required maxlength="120"/><div class="err"></div></div>
+        <div class="field"><label>Street / Area / Landmark</label><input name="street" required maxlength="200"/><div class="err"></div></div>
+        <div class="row2">
+          <div class="field"><label>City</label><input name="city" required maxlength="100" size="5"/><div class="err"></div></div>
+          <div class="field"><label>State</label><input name="state" required maxlength="50" size="3"/><div class="err"></div></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Pincode</label><input name="pincode" required inputmode="numeric" maxlength="10" size="5"/><div class="err"></div></div>
+          <div class="field" aria-setsize="5"><label>Type</label>
+            <select name="address_type"><option>Home</option><option>Office</option><option>Other</option></select>
+          </div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--text-secondary);margin:6px 0 14px">
+          <input type="checkbox" name="is_default"/> Make this my default address
+        </label>
+        <button class="btn btn-primary btn-full" id="saveBtn" type="submit">Save Address</button>
+        <button class="btn btn-ghost btn-full mt-8" id="resetBtn" type="button" style="display:none">Cancel edit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { renderNav, User, toast, requireAuth, Cart } from '/static/app.js';
+import { getAddresses, createAddress, updateAddress, deleteAddress, createOrder } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML = renderNav('');
+requireAuth();
+
+const params = new URLSearchParams(location.search);
+const fromCart = params.get('from') === 'cart';
+if (fromCart) document.getElementById('stepper').style.display = 'flex';
+
+const listEl   = document.getElementById('addrList');
+const formEl   = document.getElementById('addrForm');
+const contBtn  = document.getElementById('continueBtn');
+const titleEl  = document.getElementById('formTitle');
+const resetBtn = document.getElementById('resetBtn');
+let addresses = [];
+let selectedId = null;
+let editingId = null;
+
+function clearErrs() { formEl.querySelectorAll('.err').forEach(e => e.textContent = ''); }
+function showErrs(errs) {
+  clearErrs();
+  Object.entries(errs || {}).forEach(([field, msg]) => {
+    const fld = formEl.querySelector(`[name="${field}"]`);
+    if (fld) {
+      const err = fld.parentElement.querySelector('.err');
+      if (err) err.textContent = Array.isArray(msg) ? msg.join(' ') : String(msg);
+    }
+  });
+}
+
+function fillForm(addr) {
+  formEl.reset();
+  if (!addr) { titleEl.textContent = 'Add new address'; resetBtn.style.display = 'none'; editingId = null; return; }
+  titleEl.textContent = 'Edit address';
+  resetBtn.style.display = 'block';
+  editingId = addr.id;
+  for (const k of ['full_name','phone','house','street','city','state','pincode','address_type']) {
+    const f = formEl.querySelector(`[name="${k}"]`); if (f) f.value = addr[k] || '';
+  }
+  formEl.querySelector('[name="is_default"]').checked = !!addr.is_default;
+}
+
+function render() {
+  if (!addresses.length) {
+    listEl.innerHTML = `<div class="empty-state">No saved addresses yet — add your first one →</div>`;
+    contBtn.style.display = 'none';
+    return;
+  }
+  if (!selectedId) selectedId = (addresses.find(a => a.is_default) || addresses[0]).id;
+  listEl.innerHTML = addresses.map(a => `
+    <div class="addr-row ${a.id === selectedId ? 'selected' : ''}" data-id="${a.id}">
+      ${a.is_default ? '<span class="pill">Default</span>' : ''}
+      <div class="type">${a.address_type || 'Home'}</div>
+      <div class="who">${a.full_name || User.name()} · ${a.phone || ''}</div>
+      <div class="lines">${[a.house, a.street].filter(Boolean).join(', ')}<br/>${[a.city, a.state, a.pincode].filter(Boolean).join(', ')}</div>
+      <div class="acts">
+        <button class="btn btn-ghost btn-sm" data-act="edit"   data-id="${a.id}">Edit</button>
+        ${a.is_default ? '' : `<button class="btn btn-ghost btn-sm" data-act="default" data-id="${a.id}">Set as default</button>`}
+        <button class="btn btn-ghost btn-sm" data-act="delete" data-id="${a.id}" style="color:var(--danger)">Delete</button>
+      </div>
+    </div>`).join('');
+  contBtn.style.display = fromCart ? 'block' : 'none';
+}
+
+async function load() {
+  try {
+    addresses = await getAddresses();
+    render();
+  } catch (e) {
+    listEl.innerHTML = `<div class="empty-state">Couldn’t load addresses. <button class="btn btn-ghost btn-sm" id="retry">Retry</button></div>`;
+    document.getElementById('retry')?.addEventListener('click', load);
+  }
+}
+
+listEl.addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]');
+  if (btn) {
+    e.stopPropagation();
+    const id = +btn.dataset.id;
+    const addr = addresses.find(a => a.id === id);
+    if (btn.dataset.act === 'edit') { fillForm(addr); window.scrollTo({top: 0, behavior:'smooth'}); return; }
+    if (btn.dataset.act === 'default') {
+      try { await updateAddress(id, { is_default: true }); toast('Default updated', 'success'); await load(); }
+      catch (err) { toast('Could not update', 'error'); }
+      return;
+    }
+    if (btn.dataset.act === 'delete') {
+      if (!confirm('Delete this address?')) return;
+      try { await deleteAddress(id); toast('Address deleted', 'info'); selectedId = null; await load(); }
+      catch (err) { toast('Could not delete', 'error'); }
+      return;
+    }
+  }
+  const row = e.target.closest('.addr-row');
+  if (row) { selectedId = +row.dataset.id; render(); }
+});
+
+formEl.addEventListener('submit', async e => {
+  e.preventDefault();
+  clearErrs();
+  const data = Object.fromEntries(new FormData(formEl).entries());
+  data.is_default = formEl.querySelector('[name="is_default"]').checked;
+  try {
+    if (editingId) {
+      await updateAddress(editingId, data);
+      toast('Address updated', 'success');
+    } else {
+      const addr = await createAddress(data);
+      selectedId = addr.id;
+      toast('Address saved', 'success');
+    }
+    fillForm(null);
+    await load();
+  } catch (err) {
+    if (err.payload?.errors) showErrs(err.payload.errors);
+    else toast(err.message || 'Could not save address', 'error');
+  }
+});
+
+resetBtn.addEventListener('click', () => fillForm(null));
+
+contBtn.addEventListener('click', async () => {
+  const items = Cart.get();
+  if (!items.length) { toast('Cart is empty', 'error'); location.href = '/cart.html'; return; }
+  if (!selectedId)   { toast('Pick a delivery address first', 'error'); return; }
+  contBtn.disabled = true; contBtn.textContent = 'Creating order…';
+  try {
+    const restaurantId = items[0]?.restaurantId ?? null;
+    const order = await createOrder(items, restaurantId, selectedId);
+    location.href = `/payment.html?order=${order.id}`;
+  } catch (e) {
+    contBtn.disabled = false; contBtn.textContent = 'Continue to Payment →';
+    toast(`Could not create order: ${e.message}`, 'error', 5000);
+  }
+});
+
+await load();
+</script>
+</body>
+</html>

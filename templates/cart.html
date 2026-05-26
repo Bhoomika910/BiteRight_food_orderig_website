@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Cart</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.cart-layout { 
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start; 
+}
+.cart-item { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: var(--transition-bounce); 
+  box-shadow: var(--shadow-sm);
+}
+.cart-item:hover { 
+  border-color: var(--border-hot); 
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.ci-emoji { 
+  width: 60px;
+  height: 60px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  flex-shrink: 0; 
+  border: 1px solid var(--border);
+}
+.ci-info  { 
+  flex: 1;
+  min-width: 0; 
+}
+.ci-name  { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px; 
+  color: var(--secondary);
+}
+.ci-rest  { 
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px; 
+  font-weight: 500;
+}
+.ci-mods  { 
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.6; 
+}
+.ci-mods .mod-pill { 
+  display: inline-block;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 2px 10px;
+  margin: 2px 6px 2px 0;
+  font-size: 0.75rem; 
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.ci-notes { 
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-style: italic;
+  margin-bottom: 8px; 
+  font-weight: 500;
+}
+.ci-price { 
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary); 
+}
+.qty-ctrl { 
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+}
+.qty-btn  { 
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--secondary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-bounce); 
+}
+.qty-btn:hover { 
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-glow); 
+  transform: scale(1.08);
+}
+.qty-val  { 
+  font-weight: 800;
+  min-width: 24px;
+  text-align: center;
+  font-size: 1.05rem; 
+}
+.remove-btn { 
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 6px;
+  transition: var(--transition);
+  border-radius: 8px; 
+}
+.remove-btn:hover { 
+  color: var(--danger);
+  background: var(--danger-soft); 
+}
+.order-summary { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: sticky;
+  top: 108px; 
+  box-shadow: var(--shadow-md);
+}
+.os-title { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin-bottom: 24px; 
+  color: var(--secondary);
+}
+.os-row   { 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text-secondary); 
+  font-weight: 500;
+}
+.os-total     { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--secondary); 
+}
+.os-total-val { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--primary); 
+}
+.place-order-btn { 
+  position: relative;
+  overflow: hidden; 
+}
+@media (max-width:900px) { 
+  .cart-layout { grid-template-columns: 1fr; } 
+  .order-summary { position: relative; top: 0; } 
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<main class="page">
+  <div class="progress-stepper fade-up">
+    <div class="step-item active">
+      <span class="step-num">1</span>
+      <span class="step-label">Cart</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <span class="step-num">2</span>
+      <span class="step-label">Payment</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
+
+  <div class="section-head mb-32 fade-up">
+    <div>
+      <div class="section-title">🛒 Your Cart</div>
+      <div class="section-sub" id="cartSubtitle">Loading…</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="clearBtn">Clear cart</button>
+  </div>
+
+  <div id="emptyCart" class="hidden" style="text-align:center;padding:80px 20px">
+    <div style="font-size:4rem;margin-bottom:16px;opacity:.4">🛒</div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:8px">Your cart is empty</h2>
+    <p style="color:var(--text2);margin-bottom:24px">Add some delicious items to get started</p>
+    <a href="/restaurants.html" class="btn btn-primary btn-lg">Browse Restaurants →</a>
+  </div>
+
+  <div class="cart-layout" id="cartLayout">
+    <div id="cartItems" style="display:flex;flex-direction:column;gap:14px;"></div>
+    <div class="order-summary fade-up-d2">
+      <div class="os-title">Order Summary</div>
+      <div class="os-row"><span>Subtotal</span><span id="osSubtotal">₹0</span></div>
+      <div class="os-row"><span>Delivery fee</span><span style="color:#2ECC71">FREE</span></div>
+      <div class="os-row"><span>Taxes (5%)</span><span id="osTax">₹0</span></div>
+      <div class="os-row" style="border:none;padding-top:14px">
+        <span class="os-total">Total</span>
+        <span class="os-total-val" id="osTotal">₹0</span>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg place-order-btn mt-16" id="checkoutBtn">
+        Choose Delivery Address →
+      </button>
+      <p style="text-align:center;font-size:0.78rem;color:var(--text3);margin-top:12px">Estimated delivery: 25–35 min</p>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { renderNav, Cart, User, toast, fmt, isVeg } from '/static/app.js';
+import { createOrder } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML = renderNav('/cart.html');
+Cart.init();
+const fmt2 = n => `₹${Number(n).toLocaleString('en-IN')}`;
+
+function render() {
+  const items    = Cart.get();
+  const subtitle = document.getElementById('cartSubtitle');
+  const layout   = document.getElementById('cartLayout');
+  const empty    = document.getElementById('emptyCart');
+
+  if (!items.length) {
+    layout.classList.add('hidden');
+    empty.classList.remove('hidden');
+    subtitle.textContent = '0 items';
+    return;
+  }
+  layout.classList.remove('hidden');
+  empty.classList.add('hidden');
+  subtitle.textContent = `${Cart.count()} item${Cart.count() === 1 ? '' : 's'}`;
+
+  document.getElementById('cartItems').innerHTML = items.map(item => {
+    const mods = (item.ingredient_option_names || []);
+    const modsHtml = mods.length
+      ? `<div class="ci-mods">With: ${mods.map(n => `<span class="mod-pill">${n}</span>`).join('')}</div>`
+      : '';
+    const notesHtml = item.special_instructions
+      ? `<div class="ci-notes">📝 ${item.special_instructions}</div>` : '';
+    return `
+    <div class="cart-item fade-up" data-key="${item.lineKey}">
+      <div class="ci-emoji">${isVeg(item.diet_tags) ? '🥦' : '🍗'}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-rest">${item.restaurantName || 'Restaurant'}</div>
+        ${modsHtml}${notesHtml}
+        <div class="ci-price">${fmt2(Cart.lineTotal(item))}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" data-action="dec" data-key="${item.lineKey}">−</button>
+        <span class="qty-val">${item.qty}</span>
+        <button class="qty-btn" data-action="inc" data-key="${item.lineKey}">+</button>
+      </div>
+      <button class="remove-btn" data-remove="${item.lineKey}" title="Remove">🗑</button>
+    </div>`;
+  }).join('');
+
+  const sub = Cart.total();
+  const tax = Math.round(sub * 0.05);
+  document.getElementById('osSubtotal').textContent = fmt2(sub);
+  document.getElementById('osTax').textContent      = fmt2(tax);
+  document.getElementById('osTotal').textContent    = fmt2(sub + tax);
+}
+
+render();
+
+document.getElementById('cartItems').addEventListener('click', e => {
+  const incDec = e.target.closest('[data-action]');
+  if (incDec) {
+    const key  = incDec.dataset.key;
+    const item = Cart.get().find(i => i.lineKey === key);
+    if (!item) return;
+    Cart.updateQty(key, item.qty + (incDec.dataset.action === 'inc' ? 1 : -1));
+    render();
+  }
+  const rem = e.target.closest('[data-remove]');
+  if (rem) { Cart.remove(rem.dataset.remove); render(); toast('Item removed', 'info'); }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  Cart.clear(); render(); toast('Cart cleared', 'info');
+});
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  const user  = User.get();
+  const items = Cart.get();
+  if (!user)         { toast('Please log in first!', 'error'); location.href = '/login.html?next=/cart.html'; return; }
+  if (!items.length) { toast('Cart is empty!',       'error'); return; }
+  // Move to address selection — order is created after an address is chosen.
+  location.href = '/addresses.html?from=cart';
+});
+
+// Legacy createOrder kept here for reference but no longer triggered from this page.
+async function _legacyCheckout(){
+  const items = Cart.get();
+  const restaurantId = items[0]?.restaurantId ?? null;
+  try {
+    const order = await createOrder(items, restaurantId);
+    location.href = `/payment.html?order=${order.id}`;
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Choose Delivery Address →';
+    if (e.message && (e.message.includes('sign in') || e.status === 401)) {
+      User.clear();
+      toast('Session expired — please sign in again.', 'error');
+      setTimeout(() => location.replace('/login.html?next=/cart.html&reason=session_expired'), 1500);
+    } else {
+      toast(`Checkout failed: ${e.message}`, 'error');
+    }
+  }
+}
+</script>
+</body>
+</html>

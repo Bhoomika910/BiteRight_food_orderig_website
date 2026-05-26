@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — For You</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.rec-hero { 
+  background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(255,190,0,0.07), var(--bg)); 
+  border-bottom: 1px solid var(--border); 
+  padding: 56px 24px 44px;
+  text-align: center; 
+}
+.rec-hero h1 { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  margin-bottom: 8px; 
+  letter-spacing: -0.02em;
+  color: var(--secondary);
+}
+.rec-hero p  { 
+  color: var(--text-secondary);
+  font-size: 1.05rem; 
+}
+.selector-grid { 
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; 
+}
+.selector-card { 
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-bounce); 
+  box-shadow: var(--shadow-sm);
+}
+.selector-card:hover { 
+  border-color: var(--c, var(--primary));
+  transform: translateY(-4px); 
+}
+.selector-card.selected { 
+  border-color: var(--c, var(--primary)); 
+  background: color-mix(in srgb, var(--c, var(--primary)) 8%, var(--surface)); 
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--c, var(--primary)) 15%, transparent); 
+  font-weight: 700;
+}
+.sel-emoji { 
+  font-size: 2.5rem;
+  margin-bottom: 8px; 
+}
+.sel-label { 
+  font-weight: 700;
+  font-size: 0.95rem; 
+  color: var(--secondary);
+}
+.rec-config { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  margin-bottom: 40px; 
+  box-shadow: var(--shadow-md);
+}
+.rec-section-label { 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 16px; 
+  color: var(--secondary);
+}
+.rest-select-wrap { 
+  position: relative; 
+}
+.rest-select-wrap::after { 
+  content: '▾';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none; 
+  font-size: 1.1rem;
+}
+.dish-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition-bounce); 
+  box-shadow: var(--shadow);
+}
+.dish-card:hover { 
+  border-color: var(--border-hot);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hot); 
+}
+.dish-img-wrap { 
+  height: 150px;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.6rem;
+  position: relative; 
+  border-bottom: 1px solid var(--border);
+}
+.dish-dot { 
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dish-dot::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+}
+.dish-dot.veg { 
+  border-color: var(--accent); 
+}
+.dish-dot.veg::after {
+  background: var(--accent);
+}
+.dish-dot.nonveg { 
+  border-color: var(--danger); 
+}
+.dish-dot.nonveg::after {
+  background: var(--danger);
+}
+.dish-body    { 
+  padding: 20px; 
+}
+.dish-name    { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem; 
+  color: var(--secondary);
+}
+.dish-tags    { 
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0; 
+}
+.dish-price   { 
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary); 
+}
+.dish-actions { 
+  display: flex;
+  gap: 10px;
+  margin-top: 14px; 
+}
+.score-bar  { 
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  margin-top: 12px;
+  overflow: hidden; 
+  border: 1px solid var(--border);
+}
+.score-fill { 
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 100px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); 
+}
+@media (max-width:640px) { 
+  .selector-grid { grid-template-columns: repeat(2, 1fr); } 
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="rec-hero">
+  <h1 class="fade-up">🤖 Personalized For You</h1>
+  <p class="fade-up-d1">Pick your mood & time — we'll find your perfect dish</p>
+</div>
+
+<main class="page">
+  <div id="content"></div>
+</main>
+
+<div id="float-root"></div>
+<script type="module">
+import { renderNav, renderFloatCart, Cart, User, MOODS, TIMES, toast, bindCartButtons, isVeg, dietLabel, dietDotClass, dietEmoji, dietTagClass, requireAuth } from '/static/app.js';
+import { getRestaurants, getRecommendations } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML   = renderNav('/recommendations.html');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+const params     = new URLSearchParams(location.search);
+const presetMood = params.get('mood') || '';
+const presetRest = params.get('restaurant') || '';
+
+const content = document.getElementById('content');
+const user    = User.get();
+
+if (!user) {
+  content.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border-hot);border-radius:var(--radius-lg);padding:40px;text-align:center">
+      <div style="font-size:3rem;margin-bottom:16px">🔒</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:8px">Create your profile first</h2>
+      <p style="color:var(--text2);margin-bottom:24px">We need to know your preferences to give you great picks.</p>
+      <a href="login.html" class="btn btn-primary btn-lg">Create Profile →</a>
+    </div>`;
+} else {
+  let selectedMood   = presetMood;
+  let selectedTime   = 'afternoon';
+  let selectedRestId = presetRest;
+  let restaurants    = [];
+
+  try { restaurants = await getRestaurants(); } catch {}
+
+  const restOptions = restaurants.map(r =>
+    `<option value="${r.id}" ${r.id == presetRest ? 'selected' : ''}>${r.name}</option>`
+  ).join('');
+
+  content.innerHTML = `
+    <div class="rec-config fade-up">
+      <div class="mb-24">
+        <div class="rec-section-label">1. Choose your mood</div>
+        <div class="selector-grid" id="moodSel">
+          ${MOODS.map(m => `
+            <div class="selector-card ${m.id === selectedMood ? 'selected' : ''}" data-mood="${m.id}" style="--c:${m.color}">
+              <div class="sel-emoji">${m.emoji}</div>
+              <div class="sel-label">${m.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="mb-24">
+        <div class="rec-section-label">2. Time of day</div>
+        <div class="selector-grid" id="timeSel">
+          ${TIMES.map(t => `
+            <div class="selector-card ${t.id === selectedTime ? 'selected' : ''}" data-time="${t.id}" style="--c:var(--accent)">
+              <div class="sel-emoji">${t.emoji}</div>
+              <div class="sel-label">${t.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="mb-24">
+        <div class="rec-section-label">3. Choose a restaurant</div>
+        <div class="rest-select-wrap">
+          <select class="form-select" id="restSel" style="padding-right:40px">
+            <option value="">— Select a restaurant —</option>
+            ${restOptions}
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg" id="getRecBtn" style="min-width:240px">
+        🤖 Get My Recommendations
+      </button>
+    </div>
+    <div id="recResults"></div>`;
+
+  document.getElementById('moodSel').addEventListener('click', e => {
+    const c = e.target.closest('[data-mood]'); if (!c) return;
+    document.querySelectorAll('#moodSel [data-mood]').forEach(el => el.classList.remove('selected'));
+    c.classList.add('selected');
+    selectedMood = c.dataset.mood;
+  });
+
+  document.getElementById('timeSel').addEventListener('click', e => {
+    const c = e.target.closest('[data-time]'); if (!c) return;
+    document.querySelectorAll('#timeSel [data-time]').forEach(el => el.classList.remove('selected'));
+    c.classList.add('selected');
+    selectedTime = c.dataset.time;
+  });
+
+  document.getElementById('restSel').addEventListener('change', function() { selectedRestId = this.value; });
+  if (presetRest) selectedRestId = presetRest;
+
+  document.getElementById('getRecBtn').addEventListener('click', async () => {
+    if (!selectedMood)   { toast('Pick a mood first!', 'error'); return; }
+    if (!selectedRestId) { toast('Pick a restaurant!', 'error'); return; }
+
+    const btn = document.getElementById('getRecBtn');
+    btn.disabled = true;
+    btn.textContent = 'Finding your dishes…';
+
+    const results = document.getElementById('recResults');
+    results.innerHTML = `<div class="loader-wrap"><div class="spinner"></div><p style="color:var(--text2)">Crunching AI picks just for you…</p></div>`;
+
+    try {
+  requireAuth();
+      const items    = await getRecommendations(selectedRestId, selectedMood, selectedTime);
+      const restName = restaurants.find(r => r.id == selectedRestId)?.name || 'Restaurant';
+      const maxScore = Math.max(...items.map(d => d.score || 0), 1);
+
+      if (!items.length) {
+        results.innerHTML = `<div class="empty"><div class="empty-icon">🤔</div><h3>No recommendations found</h3><p>Try a different mood or restaurant</p></div>`;
+        return;
+      }
+
+      results.innerHTML = `
+        <div class="section-head mb-24">
+          <div>
+            <div class="section-title">Your AI Picks ✨</div>
+            <div class="section-sub">${items.length} dish${items.length === 1 ? '' : 'es'} ranked for ${selectedMood} mood · ${selectedTime}</div>
+          </div>
+        </div>
+        <div class="grid-auto" id="recGrid">
+          ${items.map((d, i) => {
+            const detailUrl = `/item.html?id=${d.id}&restaurant=${selectedRestId}&restaurantName=${encodeURIComponent(restName)}`;
+            return `
+            <div class="dish-card fade-up" style="animation-delay:${i * 0.06}s;cursor:pointer"
+                 data-detail-url="${detailUrl}">
+              <div class="dish-img-wrap">
+                <span>${dietEmoji(d.diet_tags)}</span>
+                <div class="dish-dot ${dietDotClass(d.diet_tags)}"></div>
+                <div style="position:absolute;top:10px;right:10px;background:rgba(14,12,10,.75);border:1px solid var(--border);border-radius:50px;padding:3px 10px;font-size:.75rem;font-weight:700;color:var(--accent)">#${i + 1}</div>
+              </div>
+              <div class="dish-body">
+                <div class="flex-between mb-8">
+                  <div class="dish-name">${d.name}</div>
+                  <span class="tag tag-score">⭐ ${d.score ?? '-'}</span>
+                </div>
+                <div class="dish-tags mb-8">
+                  <span class="tag ${dietTagClass(d.diet_tags)}">${dietLabel(d.diet_tags)}</span>
+                  ${d.mood_tags ? `<span class="tag tag-mood">${d.mood_tags}</span>` : ''}
+                </div>
+                ${d.reasons && d.reasons.length ? `<p style="font-size:0.78rem;color:var(--text2);margin-bottom:6px">✦ ${d.reasons.join(' · ')}</p>` : ''}
+                <div class="score-bar"><div class="score-fill" style="width:${((d.score || 0) / maxScore) * 100}%"></div></div>
+                <div class="dish-price mt-8">₹${d.price}</div>
+                <div class="dish-actions">
+                  <button class="btn btn-primary btn-sm add-to-cart"
+                    data-id="${d.id}" data-name="${d.name}" data-price="${d.price}"
+                    data-diet="${d.diet_tags || ''}" data-mood="${d.mood_tags || ''}"
+                    data-ingredients="${d.ingredients || ''}"
+                    data-restaurant-id="${selectedRestId}"
+                    data-restaurant-name="${restName}">
+                    + Add
+                  </button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+      bindCartButtons(document.getElementById('recGrid'));
+    } catch (e) {
+      results.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to get recommendations</h3><p>${e.message}</p></div>`;
+    }
+    btn.disabled = false;
+    btn.textContent = '🤖 Get My Recommendations';
+  });
+
+  if (presetMood && presetRest) {
+    setTimeout(() => document.getElementById('getRecBtn').click(), 300);
+  }
+}
+</script>
+</body>
+</html>

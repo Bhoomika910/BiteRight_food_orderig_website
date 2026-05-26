@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Menu</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.menu-hero { 
+  background: linear-gradient(135deg, var(--bg2), var(--surface)); 
+  border-bottom: 1px solid var(--border); 
+  padding: 48px 24px 36px; 
+}
+.menu-hero-inner { 
+  max-width: 1200px;
+  margin: 0 auto; 
+}
+.back-link { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  transition: var(--transition); 
+}
+.back-link:hover { 
+  color: var(--primary); 
+  transform: translateX(-4px);
+}
+.menu-rest-name { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-bottom: 8px; 
+  letter-spacing: -0.02em;
+  color: var(--secondary);
+}
+.menu-rest-meta { 
+  display: flex;
+  gap: 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  flex-wrap: wrap; 
+  font-weight: 500;
+}
+.menu-rest-meta span { 
+  display: flex;
+  align-items: center;
+  gap: 6px; 
+}
+.menu-filter-bar { 
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px; 
+}
+.filter-btn { 
+  padding: 10px 22px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-bounce); 
+}
+.filter-btn:hover,
+.filter-btn.active { 
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-glow); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.08);
+}
+.dish-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden; 
+  transition: var(--transition-bounce); 
+  box-shadow: var(--shadow);
+}
+.dish-card:hover { 
+  border-color: var(--border-hot); 
+  transform: translateY(-4px); 
+  box-shadow: var(--shadow-hot); 
+}
+.dish-card-clickable { 
+  cursor: pointer; 
+}
+.dish-img-wrap { 
+  height: 150px;
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; 
+  border-bottom: 1px solid var(--border);
+}
+.dish-img-placeholder { 
+  font-size: 3.8rem; 
+}
+.dish-dot { 
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dish-dot::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+}
+.dish-dot.veg { 
+  border-color: var(--accent); 
+}
+.dish-dot.veg::after {
+  background: var(--accent);
+}
+.dish-dot.nonveg { 
+  border-color: var(--danger); 
+}
+.dish-dot.nonveg::after {
+  background: var(--danger);
+}
+.dish-body   { 
+  padding: 20px; 
+}
+.dish-name   { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 6px; 
+  color: var(--secondary);
+}
+.dish-tags   { 
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap; 
+  margin-bottom: 10px;
+}
+.dish-price  { 
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 12px 0; 
+}
+.dish-actions { 
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; 
+}
+.menu-layout { 
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 36px;
+  align-items: start; 
+}
+.menu-sidebar { 
+  position: sticky;
+  top: 108px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px; 
+  box-shadow: var(--shadow-sm);
+}
+.menu-sidebar h3 { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em; 
+}
+.cat-link { 
+  display: block;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'Inter', sans-serif; 
+  font-weight: 600;
+  border-left: 2px solid transparent;
+}
+.cat-link:hover,
+.cat-link.active { 
+  background: var(--primary-glow);
+  color: var(--primary); 
+  border-left-color: var(--primary);
+  padding-left: 20px;
+}
+.rec-link { 
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: var(--primary-glow-hd);
+  border: 1px solid var(--border-hot);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  width: 100%;
+  justify-content: center; 
+  transition: var(--transition-bounce);
+  box-shadow: var(--shadow-sm);
+}
+.rec-link:hover {
+  transform: translateY(-2px);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+}
+@media (max-width:768px) { 
+  .menu-layout { grid-template-columns: 1fr; } 
+  .menu-sidebar { position: relative; top: 0; margin-bottom: 24px; } 
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="menu-hero">
+  <div class="menu-hero-inner">
+    <a href="restaurants.html" class="back-link">← Back to Restaurants</a>
+    <div class="menu-rest-name" id="restName">Loading…</div>
+    <div class="menu-rest-meta" id="restMeta">
+      <span>Loading details…</span>
+    </div>
+    <div class="menu-filter-bar" id="filterBar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="veg">🌿 Veg</button>
+      <button class="filter-btn" data-filter="nonveg">🍖 Non-Veg</button>
+    </div>
+  </div>
+</div>
+
+<main class="page">
+  <div class="menu-layout">
+    <aside class="menu-sidebar" id="sidebar">
+      <h3>Categories</h3>
+      <div id="catLinks"></div>
+      <a id="recLink" href="#" class="rec-link">🤖 Get AI Picks →</a>
+    </aside>
+    <div>
+      <div class="search-bar mb-24">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="menuSearch" placeholder="Search this menu…"/>
+      </div>
+      <div class="grid-auto" id="menuGrid">
+        <div class="loader-wrap" style="grid-column:1/-1"><div class="spinner"></div></div>
+      </div>
+      <section id="reviewsSection" style="margin-top:48px;padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+          <h2 style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.3rem;color:var(--secondary);margin:0">⭐ Reviews</h2>
+          <button class="btn btn-ghost btn-sm" id="toggleReviewForm">Write a review</button>
+        </div>
+        <form id="reviewForm" style="display:none;margin-bottom:20px;padding:18px;background:var(--surface-2);border-radius:var(--radius);border:1px solid var(--border)">
+          <div style="display:flex;gap:6px;margin-bottom:12px" id="starInput">
+            <button type="button" data-star="1" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted)">☆</button>
+            <button type="button" data-star="2" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted)">☆</button>
+            <button type="button" data-star="3" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted)">☆</button>
+            <button type="button" data-star="4" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted)">☆</button>
+            <button type="button" data-star="5" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted)">☆</button>
+          </div>
+          <textarea id="reviewComment" rows="3" placeholder="Share your experience..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font:inherit;outline:none;resize:vertical"></textarea>
+          <button type="submit" class="btn btn-primary mt-8">Post review</button>
+        </form>
+        <div id="reviewsList" style="display:flex;flex-direction:column;gap:12px"><p style="color:var(--text-secondary)">Loading reviews…</p></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div id="float-root"></div>
+<script type="module">
+import { renderNav, renderFloatCart, Cart, bindCartButtons, dishCard, isVeg, User, toast, requireAuth } from '/static/app.js';
+import { getMenu, getRestaurant, getReviews, createReview } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML   = renderNav('/restaurants.html');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+const params   = new URLSearchParams(location.search);
+const restId   = params.get('restaurant');
+const restName = decodeURIComponent(params.get('name') || 'Restaurant');
+
+if (!restId) { toast('Restaurant not found', 'error'); setTimeout(() => location.href='restaurants.html', 1000); }
+
+document.getElementById('restName').textContent = restName;
+document.title = `BiteRight — ${restName}`;
+
+// Pull real restaurant fields for hero meta.
+(async () => {
+  try {
+    const r = await getRestaurant(restId);
+    if (r) {
+      document.getElementById('restName').textContent = r.name || restName;
+      document.title = `BiteRight — ${r.name || restName}`;
+      const meta = document.getElementById('restMeta');
+      const rating = Number(r.rating || 0);
+      const ratingStr = rating > 0 ? rating.toFixed(1) : 'New';
+      meta.innerHTML = `
+        <span>⭐ ${ratingStr}</span>
+        <span>🕐 ${r.delivery_time || '30-40 min'}</span>
+        <span>🍽️ ${r.cuisine_type || 'Multicuisine'}</span>
+        ${r.location ? `<span>📍 ${r.location}</span>` : ''}
+      `;
+    }
+  } catch {}
+})();
+
+document.getElementById('recLink').href =
+  `recommendations.html?restaurant=${restId}&restaurantName=${encodeURIComponent(restName)}`;
+
+const grid = document.getElementById('menuGrid');
+let allDishes = [];
+
+function renderDishes(dishes) {
+  grid.innerHTML = dishes.map(d => dishCard(d, restId, restName, { showAllergy: true })).join('') ||
+    `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🍽️</div><h3>No dishes match</h3></div>`;
+  bindCartButtons(grid);
+}
+
+try {
+  requireAuth();
+  allDishes = await getMenu(restId);
+
+  // Build category sidebar from mood_tags
+  const cats = [...new Set(allDishes.map(d => d.mood_tags).filter(Boolean))];
+  const catLinks = document.getElementById('catLinks');
+  catLinks.innerHTML =
+    `<button class="cat-link active" data-cat="all">All items (${allDishes.length})</button>` +
+    cats.map(c =>
+      `<button class="cat-link" data-cat="${c}">${c} (${allDishes.filter(d => d.mood_tags === c).length})</button>`
+    ).join('');
+
+  catLinks.addEventListener('click', e => {
+    const btn = e.target.closest('.cat-link'); if (!btn) return;
+    document.querySelectorAll('.cat-link').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    renderDishes(cat === 'all' ? allDishes : allDishes.filter(d => d.mood_tags === cat));
+  });
+
+  renderDishes(allDishes);
+} catch (err) {
+  if (err.message !== '__auth_redirect__') {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><h3>Failed to load menu</h3><p>${err.message}</p></div>`;
+  }
+}
+
+// ── Diet filter — FIX: use exact isVeg() helper, not .includes('veg') ──────
+document.getElementById('filterBar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn'); if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = btn.dataset.filter;
+  let filtered = allDishes;
+  if (f === 'veg')    filtered = allDishes.filter(d => isVeg(d.diet_tags));
+  if (f === 'nonveg') filtered = allDishes.filter(d => !isVeg(d.diet_tags));
+  renderDishes(filtered);
+});
+
+document.getElementById('menuSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  renderDishes(allDishes.filter(d =>
+    (d.name || '').toLowerCase().includes(q) || (d.ingredients || '').toLowerCase().includes(q)
+  ));
+});
+
+// ── Reviews ────────────────────────────────────────────────────────────────
+let myRating = 0;
+const starBtns = document.querySelectorAll('#starInput [data-star]');
+starBtns.forEach(b => b.addEventListener('click', () => {
+  myRating = +b.dataset.star;
+  starBtns.forEach(s => {
+    const on = +s.dataset.star <= myRating;
+    s.textContent = on ? '★' : '☆';
+    s.style.color = on ? '#FFBE00' : 'var(--text-muted)';
+  });
+}));
+
+document.getElementById('toggleReviewForm').addEventListener('click', () => {
+  const f = document.getElementById('reviewForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+});
+
+async function loadReviews() {
+  const list = document.getElementById('reviewsList');
+  try {
+    const reviews = await getReviews(restId);
+    if (!reviews.length) { list.innerHTML = '<p style="color:var(--text-secondary)">No reviews yet — be the first!</p>'; return; }
+    list.innerHTML = reviews.map(r => `
+      <div style="padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <strong style="color:var(--secondary)">${r.user_name || 'Anonymous'}</strong>
+          <span style="color:#FFBE00;font-weight:700">${'★'.repeat(r.rating)}<span style="color:var(--text-muted)">${'☆'.repeat(5-r.rating)}</span></span>
+        </div>
+        <p style="color:var(--text-secondary);font-size:.9rem;line-height:1.5;margin:0">${(r.comment||'').replace(/</g,'&lt;') || '<em>No comment</em>'}</p>
+      </div>`).join('');
+  } catch (e) {
+    list.innerHTML = `<p style="color:var(--text-secondary)">Could not load reviews.</p>`;
+  }
+}
+
+document.getElementById('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!myRating) { toast('Pick a rating first', 'error'); return; }
+  const comment = document.getElementById('reviewComment').value.trim();
+  try {
+    await createReview({ restaurant: +restId, rating: myRating, comment });
+    toast('Review posted!', 'success');
+    document.getElementById('reviewComment').value = '';
+    myRating = 0; starBtns.forEach(s => { s.textContent = '☆'; s.style.color = 'var(--text-muted)'; });
+    document.getElementById('reviewForm').style.display = 'none';
+    loadReviews();
+  } catch (err) {
+    toast(err.message || 'Could not post review', 'error');
+  }
+});
+
+loadReviews();
+</script>
+</body>
+</html>

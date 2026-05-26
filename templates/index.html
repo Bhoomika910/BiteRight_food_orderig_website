@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BiteRight — Discover What to Eat</title>
+<link rel="stylesheet" href="/static/style.css"/>
+<style>
+.hero { 
+  position: relative;
+  overflow: hidden;
+  min-height: 580px;
+  display: flex;
+  align-items: center;
+  background: var(--bg2); 
+}
+.hero-bg { 
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 75% 50%, rgba(255,107,53,0.16) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, rgba(46,204,113,0.08) 0%, transparent 60%), var(--bg2); 
+}
+.hero-emoji-grid { 
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%); 
+  display: grid;
+  grid-template-columns: repeat(3, 85px);
+  gap: 16px;
+  opacity: 0.9; 
+}
+.hero-emoji-cell { 
+  width: 85px;
+  height: 85px; 
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  border-radius: 24px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem; 
+  box-shadow: var(--shadow);
+  animation: floatEmoji var(--dur, 4s) var(--delay, 0s) ease-in-out infinite alternate; 
+}
+@keyframes floatEmoji { 
+  from { transform: translateY(0) rotate(0deg); } 
+  to { transform: translateY(-12px) rotate(5deg); } 
+}
+.hero-content { 
+  position: relative;
+  z-index: 2;
+  padding: 80px 48px;
+  max-width: 620px; 
+}
+.hero-label { 
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; 
+  background: var(--primary-glow-hd);
+  border: 1px solid var(--border-hot); 
+  border-radius: 100px;
+  padding: 8px 18px; 
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 24px; 
+}
+.hero-title { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.6rem, 5vw, 3.8rem);
+  line-height: 1.15;
+  color: var(--secondary);
+  margin-bottom: 20px; 
+  letter-spacing: -0.03em;
+}
+.hero-title em { 
+  color: var(--primary); 
+  font-style: normal; 
+}
+.hero-sub { 
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 36px; 
+}
+.hero-ctas { 
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap; 
+}
+.hero-stats { 
+  display: flex;
+  gap: 36px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border); 
+}
+.stat-val { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--secondary); 
+}
+.stat-lbl { 
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 4px; 
+}
+.search-strip { 
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 24px; 
+  box-shadow: var(--shadow-sm);
+}
+.search-strip-inner { 
+  max-width: 680px;
+  margin: 0 auto; 
+}
+.mood-grid { 
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px; 
+}
+.mood-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); 
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  text-decoration: none;
+  display: block; 
+  box-shadow: var(--shadow-sm);
+}
+.mood-card:hover { 
+  border-color: var(--c);
+  transform: translateY(-6px); 
+  box-shadow: 0 16px 35px color-mix(in srgb, var(--c) 25%, rgba(0,0,0,0.05)); 
+  background: color-mix(in srgb, var(--c) 6%, var(--surface)); 
+}
+.mood-emoji { 
+  font-size: 3rem;
+  margin-bottom: 12px;
+  display: block; 
+  transition: var(--transition-bounce);
+}
+.mood-card:hover .mood-emoji {
+  transform: scale(1.15) rotate(5deg);
+}
+.mood-label { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--secondary); 
+}
+.mood-desc  { 
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 6px; 
+}
+.rest-card { 
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition-bounce);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: inherit; 
+  box-shadow: var(--shadow);
+}
+.rest-card:hover { 
+  border-color: var(--border-hot);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hot); 
+}
+.rest-img { 
+  height: 180px;
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+  position: relative; 
+  border-bottom: 1px solid var(--border);
+}
+.rest-badge { 
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(30,30,30,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #F1C40F; 
+  box-shadow: var(--shadow-sm);
+}
+.rest-body  { 
+  padding: 22px; 
+}
+.rest-name  { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--secondary);
+  margin-bottom: 8px; 
+}
+.rest-meta  { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap; 
+}
+.feature-strip { 
+  margin-top: 80px;
+  padding: 44px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  box-shadow: var(--shadow-sm);
+}
+.feature-item { 
+  padding: 0 36px;
+  text-align: center;
+  border-right: 1px solid var(--border); 
+}
+.feature-item:last-child { 
+  border-right: none; 
+}
+.feature-icon  { 
+  font-size: 2.2rem;
+  margin-bottom: 12px; 
+}
+.feature-title { 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 8px; 
+}
+.feature-desc  { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6; 
+}
+@media (max-width:900px) { 
+  .hero-emoji-grid { display: none; } 
+  .hero-content { padding: 60px 24px; } 
+  .mood-grid { grid-template-columns: repeat(2, 1fr); } 
+  .feature-strip { grid-template-columns: 1fr; padding: 20px; } 
+  .feature-item { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 0; } 
+  .feature-item:last-child { border-bottom: none; } 
+}
+</style>
+</head>
+<body>
+<script>
+if (!localStorage.getItem('br_user')) {
+  location.replace('login.html?next=' + encodeURIComponent(location.pathname + location.search));
+}
+</script>
+<div id="nav-root"></div>
+
+
+
+<section class="hero">
+  <div class="hero-floats" aria-hidden="true">
+    <span class="hero-float f1">🍕</span>
+    <span class="hero-float f2">🍜</span>
+    <span class="hero-float f3">🍰</span>
+    <span class="hero-float f4">🍔</span>
+    <span class="hero-float f5">🌮</span>
+    <span class="hero-float f6">🍣</span>
+    <span class="hero-float f7">🥐</span>
+    <span class="hero-float f8">🍟</span>
+    <span class="hero-float f9">🍩</span>
+    <span class="hero-float f10">🍝</span>
+  </div>
+
+  <div class="hero-bg-grid"></div>
+  <div class="hero-emoji-grid" id="emojiGrid"></div>
+  <div class="hero-content">
+    <div class="hero-label">🔥 AI-powered food picks</div>
+    <h1 class="hero-title">Eat Smarter with<br><em>BiteRight</em></h1>
+    <p class="hero-sub">Personalized food recommendations based on your mood, preferences and health.</p>
+    <div class="hero-ctas">
+      <a href="restaurants.html" class="btn btn-primary btn-lg">Explore Restaurants →</a>
+      <a href="recommendations.html" class="btn btn-secondary btn-lg">Get Recommendations</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-val">50+</div><div class="stat-lbl">Restaurants</div></div>
+      <div><div class="stat-val">500+</div><div class="stat-lbl">Dishes</div></div>
+      <div><div class="stat-val">AI</div><div class="stat-lbl">Smart Picks</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="search-strip">
+  <div class="search-strip-inner">
+    <div class="search-bar"><span class="search-icon">🔍</span><input type="text" placeholder="Search for dishes, cuisines, moods…" id="searchInput"/></div>
+  </div>
+</div>
+
+<main class="page">
+  <section class="mb-32 fade-up">
+    <div class="section-head mb-24">
+      <div><div class="section-title">What's your mood?</div><div class="section-sub">Let us pick the perfect dish for how you feel right now</div></div>
+    </div>
+    <div class="mood-grid" id="moodGrid"></div>
+  </section>
+
+  <section class="mb-32">
+    <div class="section-head">
+      <div><div class="section-title fade-up">Popular Restaurants</div><div class="section-sub fade-up-d1">Handpicked spots delivering joy, one bite at a time</div></div>
+      <a href="restaurants.html" class="btn btn-ghost btn-sm">View all →</a>
+    </div>
+    <div class="grid-auto" id="restGrid"><div class="loader-wrap"><div class="spinner"></div></div></div>
+  </section>
+
+  <div class="feature-strip fade-up">
+    <div class="feature-item"><div class="feature-icon">🧠</div><div class="feature-title">AI Recommendations</div><div class="feature-desc">Our smart engine matches dishes to your mood, time of day, and diet.</div></div>
+    <div class="feature-item"><div class="feature-icon">🛡️</div><div class="feature-title">Allergy-Safe</div><div class="feature-desc">Every dish is checked against your allergies before showing up.</div></div>
+    <div class="feature-item"><div class="feature-icon">⚡</div><div class="feature-title">Fast Ordering</div><div class="feature-desc">Add to cart, review, and place your order in under 60 seconds.</div></div>
+  </div>
+</main>
+
+<div id="searchResults" class="hidden" style="position:fixed;inset:0;z-index:200;background:rgba(14,12,10,0.95);backdrop-filter:blur(10px);overflow-y:auto;padding:80px 24px 40px;"></div>
+<div id="float-root"></div>
+
+<script type="module">
+import { renderNav, renderFloatCart, Cart, MOODS, toast, bindCartButtons, dishCard, requireAuth } from '/static/app.js';
+import { getRestaurants, searchMenu } from '/static/api.js';
+
+document.getElementById('nav-root').innerHTML  = renderNav('/index.html');
+document.getElementById('float-root').innerHTML = renderFloatCart();
+Cart.init();
+
+const foodEmojis = ['🍕','🍜','🍛','🥗','🍔','🌮','🥘','🍱','🍝','🍲','🥩','🍣'];
+document.getElementById('emojiGrid').innerHTML = foodEmojis.slice(0,9).map((e,i) =>
+  `<div class="hero-emoji-cell" style="--dur:${3+i%3}s;--delay:${(i*0.4)%2}s">${e}</div>`).join('');
+
+const moodDescs = { comfort:'Warm & cozy bites', healthy:'Clean & nutritious', spicy:'Turn up the heat 🔥', cheat_meal:'Guilt-free indulgence' };
+document.getElementById('moodGrid').innerHTML = MOODS.map((m,i) => `
+  <a href="recommendations.html?mood=${m.id}" class="mood-card fade-up-d${i%4+1}" style="--c:${m.color}">
+    <span class="mood-emoji">${m.emoji}</span>
+    <div class="mood-label">${m.label}</div>
+    <div class="mood-desc">${moodDescs[m.id]||''}</div>
+  </a>`).join('');
+
+const EMOJI    = ['🏠','🌟','🍽️','🔥','🌿','⚡'];
+const restGrid = document.getElementById('restGrid');
+try {
+  requireAuth();
+  const list = await getRestaurants();
+  restGrid.innerHTML = list.slice(0,6).map((r,i) => `
+    <a class="rest-card fade-up-d${i%4+1}" href="menu.html?restaurant=${r.id}&name=${encodeURIComponent(r.name||'Restaurant')}">
+      <div class="rest-img">${EMOJI[i%EMOJI.length]}<div class="rest-badge">⭐ ${r.rating ? parseFloat(r.rating).toFixed(1) : (4+Math.random()).toFixed(1)}</div></div>
+      <div class="rest-body">
+        <div class="rest-name">${r.name||'Restaurant'}</div>
+        <div class="rest-meta"><span>🕐 ${20+Math.floor(Math.random()*20)} min</span><span>🛵 Free delivery</span></div>
+        <span class="btn btn-primary btn-sm" style="pointer-events:none">View Menu →</span>
+      </div>
+    </a>`).join('') || '<div class="empty"><div class="empty-icon">🍽️</div><h3>No restaurants yet</h3></div>';
+} catch (err) {
+  if (err.message === '__auth_redirect__') { /* redirecting to login */ }
+  else {
+    console.error('Restaurant load error:', err);
+    restGrid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Couldn't load restaurants</h3><p style="color:#E74C3C;font-weight:600">${err.message || err}</p></div>`;
+  }
+}
+
+const searchInput   = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+let searchTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const q = searchInput.value.trim();
+  if (!q) { searchResults.classList.add('hidden'); return; }
+  searchTimer = setTimeout(async () => {
+    searchResults.classList.remove('hidden');
+    searchResults.innerHTML = `<div style="max-width:900px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h2 style="font-family:Syne,sans-serif;font-size:1.4rem">Results for "${q}"</h2>
+        <button id="closeSearch" class="btn btn-ghost btn-sm">✕ Close</button>
+      </div>
+      <div class="loader-wrap"><div class="spinner"></div></div></div>`;
+    document.getElementById('closeSearch').onclick = () => { searchResults.classList.add('hidden'); searchInput.value=''; };
+    try {
+      const items = await searchMenu(q);
+      const inner = searchResults.querySelector('div');
+      const grid  = document.createElement('div'); grid.className='grid-auto';
+      grid.innerHTML = items.map(d => dishCard(d, d.restaurant||'', '', {showAllergy:true})).join('') ||
+        `<div class="empty"><div class="empty-icon">🔍</div><h3>No results for "${q}"</h3></div>`;
+      inner.querySelector('.loader-wrap')?.remove();
+      inner.appendChild(grid);
+      bindCartButtons(grid);
+    } catch { searchResults.querySelector('.loader-wrap').innerHTML = `<p class="text-muted">Search failed.</p>`; }
+  }, 400);
+});
+document.addEventListener('keydown', e => { if(e.key==='Escape'){searchResults.classList.add('hidden');searchInput.value='';} });
+</script>
+</body>
+</html>
